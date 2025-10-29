@@ -1,0 +1,40 @@
+# Core LangChain
+langchain
+langchain-core
+langchain-community
+
+# LLM Providers
+langchain-google-genai
+
+# Vector Store & Embeddings
+langchain-chroma
+chromadb
+
+# Text Processing
+langchain-text-splitters
+
+# Graph Framework
+langgraph
+
+# Search
+langchain-tavily
+
+# Document Processing
+pypdf
+docx2txt
+python-docx
+
+# Environment & Configuration
+python-dotenv
+
+# Data Handling
+pandas
+pydantic
+
+# Utilities
+python-dateutil
+tiktoken
+
+# App
+streamlit
+plotly

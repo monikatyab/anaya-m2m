@@ -1,0 +1,6 @@
+user_id,first_name,last_name,address,city,province,country,user_profile,created_at,updated_at
+U0001,Bob,Thompson,124 Maple Street,Toronto,Ontario,Canada,Dairy farmer interested in sustainable agriculture and local markets.,2025-09-28 10:15,2025-10-07 9:20
+U0002,Liam,Chen,82 King Edward Avenue,Vancouver,British Columbia,Canada,Organic vegetable farmer focusing on community-supported agriculture (CSA) programs.,2025-10-01 13:47,2025-10-06 11:10
+U0003,Emma,Desjardins,300 Laurier Boulevard,Montreal,Quebec,Canada,Maple syrup producer with interest in agri-tourism and sustainable forestry.,2025-09-25 8:02,2025-10-05 12:35
+U0004,Noah,Trump,56 University Crescent,Winnipeg,Manitoba,Canada,"Grain farmer specializing in wheat and canola, exploring precision farming tools.",2025-09-30 17:22,2025-10-07 8:14
+U0005,Sophia,Brown,910 Riverbend Road,Halifax,Nova Scotia,Canada,Livestock farmer managing a small family farm with focus on animal welfare.,2025-09-27 14:59,2025-10-06 19:45
