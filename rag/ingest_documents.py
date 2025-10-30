@@ -23,5 +23,5 @@ if __name__ == "__main__":
     # Run the ingestion
     ingest_all_documents()
     
-    print("\n✅ All done! Anaya can now access your knowledge base.")
+    print("\n All done! Anaya can now access your knowledge base.")
     print("💬 Start chatting: python main.py\n")
