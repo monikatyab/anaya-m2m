@@ -104,7 +104,7 @@ def main():
             print("--- Saving Long-Term Memory ---")
             print("="*50)
             
-            print(f"💬 Session Summary:")
+            print(f" Session Summary:")
             print(f"  Messages: {len(conversation_history)}")
             print(f"  Duration: {(datetime.now() - session_started_at).seconds // 60} minutes")
             
@@ -143,7 +143,7 @@ def main():
             break
         
         if not user_message:
-            print("⚠️ Please enter a message.")
+            print(" Please enter a message.")
             continue
         
         # Update STM tracking from previous turn
