@@ -107,8 +107,6 @@ def dialogue_manager_agent(
     dialogue_prompt_template = ChatPromptTemplate.from_template(DIALOGUE_MANAGER_PROMPT)
     dialogue_chain = dialogue_prompt_template | llm.with_structured_output(DialogueManagerResponse)
 
-    print(f"DEBUG: Calling dialogue_manager with task: {task_description}")
-
     result = dialogue_chain.invoke({
         "chat_history": chat_history,
         "user_message": user_message,
@@ -119,9 +117,5 @@ def dialogue_manager_agent(
         "user_name": user_name,
     })
 
-    print(f"DEBUG: Dialogue manager result: {result}")
-    print(f"DEBUG: Result type: {type(result)}")
-
     return result
 
- 
