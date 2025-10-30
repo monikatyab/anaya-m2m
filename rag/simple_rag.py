@@ -22,8 +22,8 @@ from langchain_core.documents import Document
 load_dotenv()
 
 # Configuration
-KNOWLEDGE_BASE_DIR = "../knowledge_base"
-VECTOR_DB_PATH = "./anaya_knowledge_db"
+KNOWLEDGE_BASE_DIR = "./rag/knowledge_base"
+VECTOR_DB_PATH = "./rag/anaya_knowledge_db"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 100
 TOP_K_RESULTS = 6
