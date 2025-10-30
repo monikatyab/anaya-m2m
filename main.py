@@ -201,10 +201,17 @@ def main():
             if final_state.get("inferred_turn_intent"):
                 updated_completed_intents.append(final_state["inferred_turn_intent"])
             
+            if final_state.get("frequent_agents"):
+                frequent_agents = final_state["frequent_agents"]
+                # If session_primary_skill is still empty, set it from first agent
+                if not updated_session_primary_skill and len(frequent_agents) > 0:
+                    updated_session_primary_skill = frequent_agents[0]
+            
             # Log STM to CSV
             stm_df = short_term_memory_event_log(
                 final_state, user_id, session_id, 
-                updated_completed_intents, updated_session_primary_skill, stm_df
+                updated_completed_intents, updated_session_primary_skill, stm_df,
+                session_started_at
             )
             stm_df.to_csv("./data/STM_Data.csv", index=False)
             
