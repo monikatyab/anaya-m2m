@@ -27,17 +27,17 @@ def main():
     # Check for data files
     data_dir = Path("./data")
     if not data_dir.exists():
-        print("\n❌ Error: './data' directory not found!")
+        print("\n Error: './data' directory not found!")
         print("Please create it and add User_Data.csv, STM_Data.csv, LTM_Data.csv")
         return
     
     # Get user ID with validation
     valid_users = get_valid_user_ids()
     if not valid_users:
-        print("\n❌ Error: No users found in User_Data.csv")
+        print("\n Error: No users found in User_Data.csv")
         return
         
-    print(f"\n✅ Valid User IDs: {', '.join(valid_users)}")
+    print(f"\n Valid User IDs: {', '.join(valid_users)}")
     
     user_id = input("\nEnter User ID (or 'quit' to exit): ").strip()
     
@@ -47,7 +47,7 @@ def main():
     
     # Validate user ID
     if not validate_user_id(user_id):
-        print(f"\n❌ Error: User ID '{user_id}' not found in User_Data.csv")
+        print(f"\n Error: User ID '{user_id}' not found in User_Data.csv")
         print(f"Valid users: {', '.join(valid_users)}")
         return
     
@@ -55,7 +55,7 @@ def main():
     user_context = get_user_profile(user_id)
     
     if not user_context:
-        print(f"\n❌ Error: Could not load profile for user '{user_id}'")
+        print(f"\n Error: Could not load profile for user '{user_id}'")
         return
     
     # Initialize session
@@ -67,7 +67,7 @@ def main():
         ltm_df = pd.read_csv("./data/LTM_Data.csv")
         stm_df = pd.read_csv("./data/STM_Data.csv")
     except FileNotFoundError as e:
-        print(f"\n❌ Error loading data files: {e}")
+        print(f"\n Error loading data files: {e}")
         print("Ensure LTM_Data.csv and STM_Data.csv exist in ./data/")
         return
     
@@ -109,7 +109,7 @@ def main():
             print(f"  Duration: {(datetime.now() - session_started_at).seconds // 60} minutes")
             
             try:
-                print("\n🧠 Analyzing conversation for LTM...")
+                print("\n Analyzing conversation for LTM...")
                 
                 new_ltm_df = long_term_memory_event_log(
                     final_state=final_state,
@@ -126,20 +126,20 @@ def main():
                 
                 if len(new_ltm_df) > len(ltm_df):
                     latest_ltm = new_ltm_df.iloc[-1]
-                    print("\n✅ LTM Updated Successfully!")
+                    print("\n LTM Updated Successfully!")
                     print(f"  Journey: {str(latest_ltm['user_journey'])[:100]}...")
                 else:
-                    print("\nℹ️ No new LTM data generated")
+                    print("\nℹ No new LTM data generated")
                 
                 new_ltm_df.to_csv("./data/LTM_Data.csv", index=False)
-                print("\n💾 Saved to ./data/LTM_Data.csv")
+                print("\n Saved to ./data/LTM_Data.csv")
                 
             except Exception as e:
-                print(f"\n❌ LTM Error: {e}")
+                print(f"\n LTM Error: {e}")
                 import traceback
                 traceback.print_exc()
             
-            print("\nGoodbye! 👋")
+            print("\nGoodbye! ")
             break
         
         if not user_message:
@@ -161,7 +161,7 @@ def main():
                     if frequent_agents:
                         updated_session_primary_skill = frequent_agents[0]
             except Exception as e:
-                print(f"⚠️ Warning: Could not load STM history: {e}")
+                print(f" Warning: Could not load STM history: {e}")
         
         # Prepare turn state
         turn_state = {
@@ -217,7 +217,7 @@ def main():
             })
         
         except Exception as e:
-            print(f"\n❌ Error: {str(e)}")
+            print(f"\n Error: {str(e)}")
             import traceback
             traceback.print_exc()
             print("Please try again.")
