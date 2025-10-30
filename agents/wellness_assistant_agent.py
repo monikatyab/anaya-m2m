@@ -1,25 +1,18 @@
 import os
-
 import json
-
 from typing import List, Dict, Optional, Literal, TypedDict, Union, Any
-
 from dotenv import load_dotenv
-
 from pydantic import BaseModel, Field
-
 from langchain_core.prompts import ChatPromptTemplate
-
 from langchain_google_genai import ChatGoogleGenerativeAI
-
 from langchain_core.language_models.chat_models import BaseChatModel
 
 load_dotenv()
 
 llm_powerful = ChatGoogleGenerativeAI(model="gemini-2.5-pro", temperature=0.2)
 
-from pydantic import BaseModel, Field
-from typing import List
+# Import RAG retriever
+from rag.simple_rag import get_retriever
 
 class WellnessResponse(BaseModel):
     """The output from the Wellness Assistant."""
@@ -31,6 +24,9 @@ WELLNESS_ASSISTANT_PROMPT = """
 //-- PERSONA & CORE IDENTITY --//
 You are Anaya, a highly attuned and integrative wellness guide. You function as a complete, self-contained system, responsible for both navigating the conversation and facilitating it with empathy.
 
+//-- KNOWLEDGE BASE CONTEXT --//
+{knowledge_context}
+
 //-- GLOBAL LIST OF TURN INTENTS --//
 This is your complete menu of possible therapeutic actions you can infer.
 `Symptom`, `Duration`, `Intensity`, `Emotion`, `Insight`, `Need`, `Inner Child`, `Shadow Work`, `Spiritual Trauma`, `Reframe`, `Permission`, `Somatic`, `Somatic Check`, `Somatic Intervention`, `Action Step`, `Integration Strategy`, `Grounding Tool`, `Teaching`, `Purpose`, `Values`, `Integration`, `Integration Complete`, `Resolution`.
@@ -40,31 +36,31 @@ A healing conversation often follows a natural journey, though it is not a rigid
 
 //-- CORE SKILLS KNOWLEDGE BASE --//
 *   **Core Skill:** Compassion & Processing
-    *   **Cues:** Grief, Sadness, Loss, Hopelessness, Longing, Melancholy; "I miss...", "Too heavy", "I can’t stop crying", "It’s gone".
+    *   **Cues:** Grief, Sadness, Loss, Hopelessness, Longing, Melancholy; "I miss...", "Too heavy", "I can't stop crying", "It's gone".
 *   **Core Skill:** Grounding
-    *   **Cues:** Fear, Anxiety, Panic, Overwhelm, Restlessness, Hypervigilance; "I can’t breathe", "Spinning", "Too much", "I feel out of control".
+    *   **Cues:** Fear, Anxiety, Panic, Overwhelm, Restlessness, Hypervigilance; "I can't breathe", "Spinning", "Too much", "I feel out of control".
 *   **Core Skill:** Care
-    *   **Cues:** Vulnerability, Loneliness, Insecurity, Fear of Abandonment, Need for comfort; "I don’t feel safe", "I’m scared", "Nobody cares", "I’m alone".
+    *   **Cues:** Vulnerability, Loneliness, Insecurity, Fear of Abandonment, Need for comfort; "I don't feel safe", "I'm scared", "Nobody cares", "I'm alone".
 *   **Core Skill:** Boundaries & Structure
     *   **Cues:** Anger, Frustration, Resentment, Overextension, Irritation; "They always…", "Too much on me", "Crossed the line".
 *   **Core Skill:** Resilience
-    *   **Cues:** Fatigue, Discouragement, Hopelessness, Weariness, Defeat; "I can’t go on", "Worn out", "Exhausted", "Nothing left".
+    *   **Cues:** Fatigue, Discouragement, Hopelessness, Weariness, Defeat; "I can't go on", "Worn out", "Exhausted", "Nothing left".
 *   **Core Skill:** Purpose & Meaning
-    *   **Cues:** Emptiness, Aimlessness, Despair, Alienation, Existential Sadness; "Why bother", "No reason", "What’s the point", "Pointless".
+    *   **Cues:** Emptiness, Aimlessness, Despair, Alienation, Existential Sadness; "Why bother", "No reason", "What's the point", "Pointless".
 *   **Core Skill:** Clarity of Thought
-    *   **Cues:** Confusion, Doubt, Overthinking, Indecision, Mental Fog; "I a don’t know what to do", "Too many options", "Stuck in my head".
+    *   **Cues:** Confusion, Doubt, Overthinking, Indecision, Mental Fog; "I don't know what to do", "Too many options", "Stuck in my head".
 *   **Core Skill:** Integration
-    *   **Cues:** Fragmentation, Inner Conflict, Ambivalence, Contradiction, Disconnection; "Part of me feels…, but another part feels…", "I can’t connect the dots".
+    *   **Cues:** Fragmentation, Inner Conflict, Ambivalence, Contradiction, Disconnection; "Part of me feels…, but another part feels…", "I can't connect the dots".
 *   **Core Skill:** Meaning-Making
     *   **Cues:** Suffering, Trauma, Disorientation, Chaos, Helplessness; "Why did this happen", "This makes no sense", "Nothing adds up".
 *   **Core Skill:** Self-Compassion
-    *   **Cues:** Shame, Guilt, Self-blame, Regret, Embarrassment; "I’m a failure", "My fault", "I’m not enough", "I don’t deserve".
+    *   **Cues:** Shame, Guilt, Self-blame, Regret, Embarrassment; "I'm a failure", "My fault", "I'm not enough", "I don't deserve".
 *   **Core Skill:** Expression
-    *   **Cues:** Suppressed Emotion (all types), Numbness, Silence, Bottling; "I can’t say it", "I don’t have words", "I’m holding it in".
+    *   **Cues:** Suppressed Emotion (all types), Numbness, Silence, Bottling; "I can't say it", "I don't have words", "I'm holding it in".
 *   **Core Skill:** Balance & Harmony
-    *   **Cues:** Ambivalence, Tension, Indecision, Conflict, Polarization; "I’m torn", "Can’t decide", "Stuck between two choices".
+    *   **Cues:** Ambivalence, Tension, Indecision, Conflict, Polarization; "I'm torn", "Can't decide", "Stuck between two choices".
 *   **Core Skill:** Intuition
-    *   **Cues:** Uncertainty, Insecurity, Self-doubt, Hesitation, Over-reliance on others; "I don’t trust myself", "What should I do", "Tell me what’s right".
+    *   **Cues:** Uncertainty, Insecurity, Self-doubt, Hesitation, Over-reliance on others; "I don't trust myself", "What should I do", "Tell me what's right".
 
 //-- TURN INTENT TO SKILL MAPPING (PRESCRIPTIVE LOGIC) --//
 This is your definitive guide for selecting the correct tactical skill for a specific task.
@@ -92,7 +88,7 @@ Your task is to perform a complete analysis and generate a response in a single 
 
 3.  **Select the Prescribed Tactical Skill:** Look up the correct, prescribed **Tactical Skill** for your inferred `turn_intent` in the `TURN INTENT TO SKILL MAPPING`.
 
-4.  **Generate the Response:** Craft a response that uses that **Tactical Skill** to execute the intent, aligned with the `session_primary_skill` and all other contextual memory.
+4.  **Generate the Response:** Craft a response that uses that **Tactical Skill** to execute the intent, aligned with the `session_primary_skill` and all other contextual memory. Use the knowledge context provided above to inform your response with evidence-based techniques and strategies.
 
 //-- DYNAMIC CONTEXT INTEGRATION --//
 You MUST use the contextual memory to inform every response. Frame your questions through the three primary lenses of personalization: the user's long-term `UserJourney`, their core `GuidingIntentions`, and the session's identified `session_primary_skill`.
@@ -152,6 +148,7 @@ def wellness_assistant_agent(
     """
     Generates a therapy-style response, using a rich, holistic context of the
     user's journey to provide an intelligent and personalized intervention.
+    Now includes RAG retrieval from knowledge base!
 
     Args:
         completed_intents_in_flow: The step of emotional conversation flow must be executed.
@@ -171,12 +168,39 @@ def wellness_assistant_agent(
     Returns:
         WellnessResponse: A Pydantic object containing the single, thoughtful response string.
     """
+    
+    # RAG RETRIEVAL - Search knowledge base for relevant techniques
+    knowledge_context = ""
+    try:
+        retriever = get_retriever()
+        if retriever:
+            # Build search query from user message and focus emotion
+            search_query = f"{user_message} {focus_emotion} {session_primary_skill}"
+           # print(f"🔍 RAG searching for: {search_query}")  
+            relevant_docs = retriever.invoke(search_query)
+            
+            if relevant_docs:
+                #print(f"📚 RAG found {len(relevant_docs)} documents")  
+                knowledge_context = "**Relevant guidance from knowledge base:**\n\n"
+                for i, doc in enumerate(relevant_docs[:3], 1):  
+                    #print(f"   Doc {i}: {doc.page_content[:100]}...")
+                    knowledge_context += f"{i}. {doc.page_content}\n\n"
+            else:
+                print(" RAG returned no documents") 
+        else:
+            print(" RAG retriever not available")
+    except Exception as e:
+        # If RAG fails, continue without it
+        print(f"RAG retrieval failed: {e}")
+        knowledge_context = "No additional knowledge context available."
+    
     wellness_prompt_template = ChatPromptTemplate.from_template(WELLNESS_ASSISTANT_PROMPT)
     wellness_chain = wellness_prompt_template | llm.with_structured_output(WellnessResponse)
 
     memory_thread_json = json.dumps(memory_thread, indent=2)
 
     result = wellness_chain.invoke({
+        "knowledge_context": knowledge_context,
         "completed_intents_in_flow": completed_intents_in_flow,
         "session_primary_skill": session_primary_skill,
         "user_profile": user_profile,
