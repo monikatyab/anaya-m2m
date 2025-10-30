@@ -30,7 +30,7 @@ TOP_K_RESULTS = 6
 
 # Embedding model
 embed_model = GoogleGenerativeAIEmbeddings(
-    model="models/text-embedding-004",
+    model="models/embedding-001",  
     google_api_key=os.getenv("GOOGLE_API_KEY")
 )
 
@@ -40,7 +40,7 @@ def load_documents_from_folder(folder_path: str) -> List[Document]:
     documents = []
     Path(folder_path).mkdir(parents=True, exist_ok=True)
     
-    print(f"\n📂 Scanning {folder_path} for documents...")
+    print(f"\n Scanning {folder_path} for documents...")
     
     # Load PDFs
     try:
@@ -78,7 +78,7 @@ def load_documents_from_folder(folder_path: str) -> List[Document]:
     except Exception as e:
         print(f"Warning: Error loading TXT files: {e}")
     
-    print(f"✅ Loaded {len(documents)} document chunks")
+    print(f" Loaded {len(documents)} document chunks")
     return documents
 
 
@@ -98,14 +98,14 @@ def chunk_documents(documents: List[Document]) -> List[Document]:
 def create_or_update_vectordb(documents: List[Document]):
     """Create or update the vector database"""
     if not documents:
-        print("⚠️ No documents to index!")
+        print(" No documents to index!")
         return
     
     print(f"\n🔧 Creating/updating vector database at {VECTOR_DB_PATH}...")
     
     # Remove old database if exists
     if os.path.exists(VECTOR_DB_PATH):
-        print("🗑️ Removing old database...")
+        print(" Removing old database...")
         import shutil
         shutil.rmtree(VECTOR_DB_PATH)
     
@@ -117,14 +117,14 @@ def create_or_update_vectordb(documents: List[Document]):
         collection_name="anaya-knowledge"
     )
     
-    print(f"✅ Vector database created with {len(documents)} chunks!")
+    print(f" Vector database created with {len(documents)} chunks!")
     return vectorstore
 
 
 def get_retriever():
     """Get retriever for querying the knowledge base"""
     if not os.path.exists(VECTOR_DB_PATH):
-        print("⚠️ No vector database found! Run: python -m rag.ingest_documents")
+        print(" No vector database found! Run: python -m rag.ingest_documents")
         return None
     
     vectorstore = Chroma(
@@ -142,14 +142,14 @@ def get_retriever():
 def ingest_all_documents():
     """Main ingestion function"""
     print("\n" + "="*60)
-    print("🌾 ANAYA AI - KNOWLEDGE BASE INGESTION")
+    print(" ANAYA AI - KNOWLEDGE BASE INGESTION")
     print("="*60)
     
     # Load documents
     documents = load_documents_from_folder(KNOWLEDGE_BASE_DIR)
     
     if not documents:
-        print("\n⚠️ No documents found in knowledge_base/ folder!")
+        print("\nNo documents found in knowledge_base/ folder!")
         print("Add PDF, DOCX, or TXT files to knowledge_base/ and run again.")
         return
     
@@ -162,7 +162,7 @@ def ingest_all_documents():
     print("\n" + "="*60)
     print("✨ INGESTION COMPLETE!")
     print("="*60)
-    print(f"📚 Total documents processed: {len(documents)}")
-    print(f"📝 Total chunks created: {len(chunks)}")
-    print(f"💾 Database location: {VECTOR_DB_PATH}")
-    print("\n🎯 The knowledge base is now ready for use by Anaya AI agents!")
+    print(f" Total documents processed: {len(documents)}")
+    print(f" Total chunks created: {len(chunks)}")
+    print(f" Database location: {VECTOR_DB_PATH}")
+    print("\n The knowledge base is now ready for use by Anaya AI agents!")
