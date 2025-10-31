@@ -210,8 +210,7 @@ def main():
             # Log STM to CSV
             stm_df = short_term_memory_event_log(
                 final_state, user_id, session_id, 
-                updated_completed_intents, updated_session_primary_skill, stm_df,
-                session_started_at
+                updated_completed_intents, updated_session_primary_skill, stm_df
             )
             stm_df.to_csv("./data/STM_Data.csv", index=False)
             
