@@ -19,8 +19,7 @@ def short_term_memory_event_log(
     session_id: str, 
     updated_completed_intents_in_flow: str, 
     updated_session_primary_skill: str, 
-    stm_df: pd.DataFrame,
-    session_started_at: datetime = None
+    stm_df: pd.DataFrame
 ) -> pd.DataFrame():
     """
     Assembles a structured event log from the final state of a workflow run.
@@ -33,7 +32,6 @@ def short_term_memory_event_log(
         updated_completed_intents_in_flow (str): The list that serves as a memory of all the turn_intents.
         updated_session_primary_skill (str): The overarching "Core Skill" for the session.
         stm_df (DataFrame): The STM DataFrame to which the new event log will be appended.
-        session_started_at (datetime): The timestamp when the session began.
 
     Returns:
         DataFrame: The updated STM DataFrame with the new event log row.
@@ -48,30 +46,19 @@ def short_term_memory_event_log(
         event_status = "FAILURE"
         error_details = "Planner failed to generate a valid execution plan."
 
-    # Get tool_use from execution_plan (which tools were used)
-    tool_use = []
-    if plan:
-        for step in plan:
-            if isinstance(step, dict) and 'tool' in step:
-                tool_use.append(step['tool'])
-    
     event_data = {
         "event_id": str(uuid.uuid4()),
         "timestamp": datetime.now(),
         "user_id": user_id,
         "session_id": session_id,
-        "session_started_at": session_started_at if session_started_at else datetime.now(),
-        "session_ended_at": datetime.now(),
         "event_status": event_status,
         "error_details": error_details,
         "session_topic": state.get("session_topic", ""),
         "session_mood": state.get("session_mood", ""),
         "focus_emotion": state.get("focus_emotion", ""),
-        "inferred_turn_intent": state.get("inferred_turn_intent", ""),
         "completed_intents_in_flow": str(updated_completed_intents_in_flow),
         "session_primary_skill": updated_session_primary_skill,
         "frequent_agents": str(state.get("frequent_agents", [])),
-        "tool_use": str(tool_use) if tool_use else "",
         "execution_plan": str(plan) if plan else "",
         "completed_steps": str(state.get("completed_steps", [])),
         "user_message": state.get("user_message", ""),
