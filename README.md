@@ -163,7 +163,3 @@ All data stored locally in CSV files. No external transmission except Google AI 
 ## Tech Stack
 
 Built with LangChain, LangGraph, Google Gemini, ChromaDB, and Streamlit.
-
-## License
-
-MIT License
