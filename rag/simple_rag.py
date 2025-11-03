@@ -24,13 +24,13 @@ load_dotenv()
 # Configuration
 KNOWLEDGE_BASE_DIR = "./rag/knowledge_base"
 VECTOR_DB_PATH = "./rag/anaya_knowledge_db"
-CHUNK_SIZE = 500
+CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 100
 TOP_K_RESULTS = 6
 
 # Embedding model
 embed_model = GoogleGenerativeAIEmbeddings(
-    model="models/embedding-001",  
+    model="models/text-embedding-004",   
     google_api_key=os.getenv("GOOGLE_API_KEY")
 )
 
